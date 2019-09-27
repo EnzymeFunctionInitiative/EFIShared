@@ -3,6 +3,7 @@ package EFI::Annotations;
 
 use strict;
 use constant UNIREF_ONLY => 1;
+use constant REPNODE_ONLY => 2;
 
 # Use these rather than the ones in EFI::Config
 use constant FIELD_SEQ_SRC_KEY => "Sequence_Source";
@@ -387,22 +388,28 @@ sub is_expandable_attr {
     $self->{anno} = get_annotation_data() if not exists $self->{anno};
 
     my $result = 0;
-    if (not $flag) {
+    if (not $flag or $flag == flag_repnode_only()) {
         $result = (
             $attr eq FIELD_ID_ACC       or $attr eq $self->{anno}->{"ACC"}->{display}               or 
             $attr eq "ACC_CDHIT"        or $attr eq $self->{anno}->{"ACC_CDHIT"}->{display}
         );
     }
-    $result = ($result or (
-        $attr eq FIELD_UNIREF50_IDS     or $attr eq $self->{anno}->{"UniRef50_IDs"}->{display}  or 
-        $attr eq FIELD_UNIREF90_IDS     or $attr eq $self->{anno}->{"UniRef90_IDs"}->{display}  or 
-        $attr eq FIELD_UNIREF100_IDS    or $attr eq $self->{anno}->{"UniRef100_IDs"}->{display}     
-    ));
+    if (not $flag or $flag == flag_uniref_only()) {
+        $result = ($result or (
+            $attr eq FIELD_UNIREF50_IDS     or $attr eq $self->{anno}->{"UniRef50_IDs"}->{display}  or 
+            $attr eq FIELD_UNIREF90_IDS     or $attr eq $self->{anno}->{"UniRef90_IDs"}->{display}  or 
+            $attr eq FIELD_UNIREF100_IDS    or $attr eq $self->{anno}->{"UniRef100_IDs"}->{display}     
+        ));
+    }
     return $result;
 }
 
 sub flag_uniref_only {
     return UNIREF_ONLY;
+}
+
+sub flag_repnode_only {
+    return REPNODE_ONLY;
 }
 
 # Returns the SwissProt description, if any, from an XML node in an SSN.
