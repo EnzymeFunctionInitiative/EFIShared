@@ -181,6 +181,7 @@ sub build_annotations {
     $tab .= "\n\tSpecies\t" . merge_anno_rows(\@rows, "Species") if &$attrFunc("Species");
     $tab .= "\n\tCAZY\t" . merge_anno_rows(\@rows, "Cazy") if &$attrFunc("CAZY");
     $tab .= "\n\tNCBI_IDs\t" . join(",", @$ncbiIds) if $ncbiIds and &$attrFunc("NCBI_IDs");
+    $tab .= "\n\tFragment\t" . merge_anno_rows(\@rows, "Fragment", {0 => "complete", 1 => "fragment"}) if &$attrFunc("Fragment");
     # UniRef is added elsewhere
     #$tab .= "\n\tUniRef50\t" . $row->{"UniRef50_Cluster"} if $row->{"UniRef50_Cluster"};
     #$tab .= "\n\tUniRef90\t" . $row->{"UniRef90_Cluster"} if $row->{"UniRef90_Cluster"};
@@ -232,8 +233,12 @@ sub parse_interpro {
 sub merge_anno_rows {
     my $rows = shift;
     my $field = shift;
+    my $typeSpec = shift || {};
 
-    my $value = join($AnnoRowSep, map { $_->{$field} } @$rows);
+    my $value = join($AnnoRowSep,
+        map { 
+            exists $typeSpec->{$_->{$field}} ? $typeSpec->{$_->{$field}} : $_->{$field}
+        } @$rows);
     return $value;
 }
 
@@ -305,6 +310,7 @@ sub get_annotation_data {
     $annoData{"ACC_CDHIT_COUNT"}            = {order => $idx++, display => "CD-HIT Cluster Size"};
     $annoData{"Sequence"}                   = {order => $idx++, display => "Sequence"};
     $annoData{"User_IDs_in_Cluster"}        = {order => $idx++, display => "User IDs in Cluster"};
+    $annoData{"Fragment"}                   = {order => $idx++, display => "Sequence Status"};
 
     return \%annoData;
 }
