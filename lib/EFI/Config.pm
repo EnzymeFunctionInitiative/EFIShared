@@ -15,7 +15,7 @@ use constant {
     DATABASE_SECTION            => "database",
     DATABASE_USER               => "user",
     DATABASE_PASSWORD           => "password",
-    DATABASE_NAME               => "database",
+    DATABASE_NAME               => "name",
     DATABASE_HOST               => "host",
     DATABASE_PORT               => "port",
     DATABASE_IP_RANGE           => "ip_range",
@@ -105,10 +105,9 @@ sub parseConfig {
     $object->{db}->{ip_range} = $cfg->val(DATABASE_SECTION, DATABASE_IP_RANGE, "");
     $object->{db}->{dbi} = lc $cfg->val(DATABASE_SECTION, DATABASE_DBI, DATABASE_MYSQL);
 
-    if (exists $ENV{&ENVIRONMENT_DB}) {
+    $object->{db}->{name} = $cfg->val(DATABASE_SECTION, DATABASE_NAME);
+    if (not $object->{db}->{name} and exists $ENV{&ENVIRONMENT_DB}) {
         $object->{db}->{name} = $ENV{&ENVIRONMENT_DB};
-    } else {
-        $object->{db}->{name} = $cfg->val(DATABASE_SECTION, DATABASE_NAME);
     }
 
     if ($object->{db}->{dbi} eq DATABASE_MYSQL) {
