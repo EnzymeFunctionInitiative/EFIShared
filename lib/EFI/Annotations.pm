@@ -219,10 +219,11 @@ sub parse_interpro {
             my $fam = $fams[$i];
     
             #TODO: remove hardcoded constants here
-            push @dom, $fam if $type eq "Domain";
-            push @fam, $fam if $type eq "Family";
-            push @sup, $fam if $type eq "Homologous_superfamily";
-            push @other, $fam if $type ne "Domain" and $type ne "Family" and $type ne "Homologous_superfamily";
+            $type = lc $type;
+            push @dom, $fam if $type eq "domain";
+            push @fam, $fam if $type eq "family";
+            push @sup, $fam if $type eq "homologous_superfamily";
+            push @other, $fam if $type ne "domain" and $type ne "family" and $type ne "homologous_superfamily";
         }
     }
 
