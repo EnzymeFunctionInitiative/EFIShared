@@ -676,6 +676,7 @@ sub save_meta_struct {
 
 sub parse_meta_string {
     my $string = shift;
+    return {} if $string =~ m/^\s*$/;
     $string =~ s/\\//g; #TODO: remove this after we re-build 2022_03
     my $struct = decode_json($string);
     return $struct;
