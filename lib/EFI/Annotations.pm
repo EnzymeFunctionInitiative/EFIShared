@@ -87,12 +87,14 @@ select
     A.*,
     T.*,
     group_concat(distinct P.id) as PFAM2,
+    group_concat(distinct TG.id) as TIGR,
     group_concat(I.family_type) as ipro_type,
     group_concat(I.id) as ipro_fam
 from annotations as A
 left join taxonomy as T on A.$taxColVer = T.$taxColVer
 left join PFAM as P on A.accession = P.accession
 left join INTERPRO as I on A.accession = I.accession
+left join TIGRFAMs AS TG on A.accession = TG.accession
 where A.$column $idQuoted $extraWhere
 group by A.accession
 SQL
@@ -172,6 +174,7 @@ sub build_annotations {
         #"hmp_oxygen" => sub { my $key = shift; return merge_anno_rows(\@rows, $key, {"" => "None"}); },
         #"hmp_site" => sub { my $key = shift; return merge_anno_rows(\@rows, $key, {"" => "None"}); },
         "PFAM" => sub { my $key = shift; return merge_anno_rows(\@rows, "PFAM2", {"" => "None"}); },
+        "TIGRFAMs" => sub { my $key = shift; return merge_anno_rows(\@rows, "TIGR", {"" => "None"}); },
         "gdna" => $booleanFunc,
         "NCBI_IDs" => sub { return join(",", @$ncbiIds); },
     };
@@ -427,7 +430,7 @@ sub get_annotation_fields {
     my @fields;
 
     # db_primary_col is present if it is required to be in the same table (e.g. not stored in a JSON structure, or in an external table)
-    push @fields, {name => "accession",                 field_type => "db",     type_spec => "VARCHAR(10)",     display => "",                                                                                      db_primary_col => 1,index_name => "uniprot_accession_idx",                              primary_key => 1,   db_hidden => 1};
+    push @fields, {name => "accession",                 field_type => "db",     type_spec => "VARCHAR(10)",     display => "",                                                                                      db_primary_col => 1,index_name => "uniprot_accession_idx",                              primary_key => 1};
     push @fields, {name => "Sequence_Source",           field_type => "ssn",                                    display => "Sequence Source"};
     push @fields, {name => "organism",                  field_type => "db",     type_spec => "VARCHAR(150)",    display => "Organism",                      base_ssn => 1,                                                                          json_type_spec => "str",    json_name => "o"};
     push @fields, {name => "taxonomy_id",               field_type => "db",     type_spec => "INT",             display => "Taxonomy ID",                   base_ssn => 1,                                          db_primary_col => 1,index_name => "taxonomy_id_idx"};
@@ -463,6 +466,7 @@ sub get_annotation_fields {
     push @fields, {name => "pdb",                       field_type => "db",     type_spec => "VARCHAR(3000)",   display => "PDB",                           base_ssn => 1,                      ssn_list_type => 1,                                 json_type_spec => "array",  json_name => "pdb"};
 
     push @fields, {name => "PFAM",                      field_type => "ssn",                                    display => "PFAM",                          base_ssn => 1,                      ssn_list_type => 1};
+    push @fields, {name => "TIGRFAMs",                  field_type => "ssn",                                    display => "TIGRFAMs",                      base_ssn => 1,                      ssn_list_type => 1};
 
     push @fields, {name => "uniprot_pfam",              field_type => "db",                                                                                                                                                                         json_type_spec => "array",                      db_hidden => 1};
 
@@ -485,6 +489,7 @@ sub get_annotation_fields {
     push @fields, {name => "gdna",                      field_type => "db",     type_spec => "BOOL",            display => "P01 gDNA",                      base_ssn => 1,                                                                          json_type_spec => "str",    json_name => "gd"};
     push @fields, {name => "rhea",                      field_type => "db",     type_spec => "VARCHAR(50)",     display => "Rhea",                          base_ssn => 1,                      ssn_list_type => 1,                                 json_type_spec => "array",  json_name => "rh"};
     push @fields, {name => "efi_tid",                   field_type => "db",                                                                                                                                                                         json_type_spec => "str",                        db_hidden => 1};
+    push @fields, {name => "alphafold",                 field_type => "db",     type_spec => "VARCHAR(16)",     display => "AlphaFold",                     base_ssn => 1,                                                                          json_type_spec => "str",    json_name => "af"};
 
     push @fields, {name => FIELD_UNIREF50_IDS,          field_type => "ssn",                                    display => "UniRef50 Cluster IDs",                                              ssn_list_type => 1};
     push @fields, {name => FIELD_UNIREF50_CLUSTER_SIZE, field_type => "ssn",                                    display => "UniRef50 Cluster Size",                         ssn_num_type => 1};

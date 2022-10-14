@@ -42,8 +42,8 @@ use constant {
     TAX_SECTION                 => "taxonomy",
     TAX_REMOTE_URL              => "remote_url",
 
-    ENVIRONMENT_DB              => "EFIDB",
-    ENVIRONMENT_CONFIG          => "EFICONFIG",
+    ENVIRONMENT_DB              => "EFI_DB",
+    ENVIRONMENT_CONFIG          => "EFI_CONFIG",
 };
 
 use constant NO_ACCESSION_MATCHES_FILENAME => "no_accession_matches.txt";
@@ -64,8 +64,8 @@ sub cluster_configure {
     $object->{config_file_path} = $FindBin::Bin . "/" . "efi.config";
     if (exists $args{config_file_path}) {
         $object->{config_file_path} = $args{config_file_path};
-    } elsif (exists $ENV{EFICONFIG}) {
-        $object->{config_file_path} = $ENV{EFICONFIG};
+    } elsif (exists $ENV{EFI_CONFIG}) {
+        $object->{config_file_path} = $ENV{EFI_CONFIG};
     }
     
     if (exists $args{dryrun}) {
