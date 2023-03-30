@@ -65,6 +65,8 @@ sub build_query_string_base {
     my $extraWhere = shift || "";
     my $isLegacy = shift || 0;
 
+    my $useTigr = 0;
+
     my @ids = ($id);
     if (ref $id eq "ARRAY") {
         @ids = @$id;
@@ -81,20 +83,22 @@ sub build_query_string_base {
     if ($Version == 1) {
         $sql = "select * from annotations where $column $idQuoted";
     } else {
+        my $tigrJoin = $useTigr ? "left join TIGRFAMs AS TG on A.accession = TG.accession" : "";
+        my $tigrConcat = $useTigr ? "    group_concat(distinct TG.id) as TIGR," : "";
         my $taxColVer = $isLegacy ? "Taxonomy_ID" : "taxonomy_id";
         $sql = <<SQL;
 select
     A.*,
     T.*,
     group_concat(distinct P.id) as PFAM2,
-    group_concat(distinct TG.id) as TIGR,
+    $tigrConcat
     group_concat(I.family_type) as ipro_type,
     group_concat(I.id) as ipro_fam
 from annotations as A
 left join taxonomy as T on A.$taxColVer = T.$taxColVer
 left join PFAM as P on A.accession = P.accession
 left join INTERPRO as I on A.accession = I.accession
-left join TIGRFAMs AS TG on A.accession = TG.accession
+$tigrJoin
 where A.$column $idQuoted $extraWhere
 group by A.accession
 SQL

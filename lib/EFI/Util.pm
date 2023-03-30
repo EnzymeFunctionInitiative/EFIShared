@@ -48,29 +48,35 @@ sub getLmod {
 
 sub checkNetworkType {
     my $file = shift;
-    my ($type, $isDomain) = ("UniProt", 0);
 
-    if ($file =~ m/.zip$/) {
-        $file = "unzip -c $file | sed '/<\\/node>/q' |";
+    my $type = "UniProt";
+    my $isDomain = 0;
+
+    my $text = "";
+    if ($file =~ m/\.zip$/i) {
+        $text = `unzip -p $file | head -1000`;
+    } else {
+        $text = `head -1000 $file`;
     }
 
-    my $success = open FILE, $file;
-    if (not $success) {
-        warn "Unable to scan input SSN $file for type: $!";
-        return (0, 0);
+    $isDomain = ($text =~ m/<node[^>]+label=["'][^"':]+:\d/s);
+    if ($text =~ m/<att[^>]+name=["'](UniRef([59]0))/s) {
+        $type = $1 if ($1 and ($2 eq "50" or $2 eq "90"));
     }
 
-    while (<FILE>) {
-        if (m/<node .*label="([^"]+)"/) {
-            $isDomain = ($1 =~ m/:/);
-        } elsif (m/<\/node/) {
-            last;
-        } elsif (m/<att .*UniRef(\d+) /) {
-            $type = "UniRef$1";
-        }
-    }
-
-    close FILE;
+    # BAD CODE, DON'T USE:
+    #    open my $fh, "<", $file or die "Unable to check network type for $file: $!";
+    #    while (my $line = <$fh>) {
+    #        if (not defined $isDomain and $line =~ m/DOM_yes/) {
+    #            $isDomain = 1;
+    #        }
+    #        if (not $type and $line =~ m/UniRef([59]0)/) {
+    #            $type = "UniRef$1";
+    #        }
+    #        last if (defined $isDomain and $type);
+    #    }
+    #    $type = "UniProt" if not $type;
+    #    $isDomain = 0 if not defined $isDomain;
 
     return ($type, $isDomain);
 }
