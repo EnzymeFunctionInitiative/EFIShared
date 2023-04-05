@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use Getopt::Long;
+
 
 my ($outputFile, $dbName);
 my $output = GetOptions(
