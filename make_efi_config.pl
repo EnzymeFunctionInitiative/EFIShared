@@ -12,7 +12,7 @@ my $output = GetOptions(
     "db-name=s"         => \$dbName,
 );
 
-die "Need --output output file" if not $outputFile or not -f $outputFile;
+die "Need --output output file" if not $outputFile;
 
 $dbName = "" if not $dbName;
 
@@ -29,6 +29,7 @@ password=
 ;database=$dbName
 
 [idmapping]
+remote_url=ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/idmapping.dat.gz
 table_name=idmapping
 uniprot_id=uniprot_id
 
@@ -41,6 +42,15 @@ PDB=enabled
 [cluster]
 queue=
 extra_path=
+
+[taxonomy]
+remote_url=ftp://ftp.ebi.ac.uk/pub/databases/ena/taxonomy/taxonomy.xml.gz
+
+[database-build]
+uniprot_url=ftp://ftp.uniprot.org/pub/databases/uniprot/current_release
+interpro_url=ftp://ftp.ebi.ac.uk/pub/databases/interpro/current
+pfam_info_url=ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.clans.tsv.gz
+clan_info_url=ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-C.gz
 
 CONFIG
 ;
