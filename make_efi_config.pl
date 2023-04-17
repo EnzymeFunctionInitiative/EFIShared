@@ -6,15 +6,17 @@ use warnings;
 use Getopt::Long;
 
 
-my ($outputFile, $dbName);
+my ($outputFile, $dbName, $dbi);
 my $output = GetOptions(
     "output=s"          => \$outputFile,
     "db-name=s"         => \$dbName,
+    "db-interface=s"    => \$dbi,
 );
 
 die "Need --output output file" if not $outputFile;
 
 $dbName = "" if not $dbName;
+$dbi = "" if not $dbi;
 
 
 open my $fh, ">", $outputFile or die "Unable to write to $outputFile: $!";
@@ -27,6 +29,7 @@ password=
 ;port=
 ;ip_range=
 ;database=$dbName
+dbi=$dbi
 
 [idmapping]
 remote_url=ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/idmapping.dat.gz
